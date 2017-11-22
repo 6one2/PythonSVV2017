@@ -16,9 +16,10 @@ Fs=10000
 
 readfolder = '/Users/sebastienvillard/Documents/LawsonImaging/Expes/SVV/Test/CoilFieldVoltage/'
 datafile = ['MF020_High.lvm','MF060_High.lvm','MF020_Steps.lvm','MF060_Steps.lvm',]
-datafile = ['MF020_Steps.lvm']
+#datafile = ['MF020_Steps.lvm']
+Coef = np.zeros([len(datafile),2])
 
-for fname in datafile:
+for count, fname in enumerate(datafile):
     print(readfolder+fname)
     data = pd.read_csv(readfolder+fname,skiprows=23,delimiter='\t')
     data.columns = data.columns=(['time','MF','Current','V','Comment'])
@@ -44,25 +45,45 @@ for fname in datafile:
     ii = np.flatnonzero(np.diff(data.MF[idxPeak])>thr)#look for transition in max MF
     idxSP=idxPeak[ii+1];
     idxEP=idxPeak[ii[1:]];idxEP = np.append(idxEP,idxPeak[-1])
+    resP1 = np.zeros([len(idxSP),2]);ct=0
     
     for st, en in zip(idxSP, idxEP):
+        
         section = np.arange(st,en)
         
-        A = data.MF[st]
-        w = 20
-        t = data.time[section]-data.time[st]
-        Sin = A*np.sin(2*np.pi*w*t+np.pi/2)
+        # fit linear regression
+        if True:
+            P = np.polyfit(data.Current[section],data.MF[section],1)
+            Y = P[0]*data.Current[section]+P[1]
+            
+            resP1[ct,0]=P[0];resP1[ct,1]=P[1];ct=ct+1
+            
+            plt.figure()
+            plt.plot(data.Current[section],data.MF[section],'.')
+            plt.plot(data.Current[section],Y,'k',linewidth=1)
+            plt.title('Y = ' + str(P[0]) + 'X + ' + str(P[1]))
         
-        COR = np.corrcoef(Sin,data.MF[section])[0][1]
+        #find a coef for linear regression
+        Coef[count,0] = np.mean(resP1[0:len(resP1)-1,0])
+        Coef[count,1] = np.mean(resP1[0:len(resP1)-1,1])
         
-        plt.figure()
         
-        plt.plot(data.time[section],data.MF[section],linewidth=3)
-        plt.plot(data.time[section],Sin,'k')
-        plt.ylim(-210,210)
-        plt.title('R = ' + str(COR))
+        # sinus simulation for each section
+        if False:
+            A = data.MF[st]
+            w = 20 # 20 Hz signal
+            t = data.time[section]-data.time[st]
+            Sin = A*np.sin(2*np.pi*w*t+np.pi/2)
+            COR = np.corrcoef(Sin,data.MF[section])[0][1]
+        
+            plt.figure()
+            plt.plot(data.time[section],data.MF[section],linewidth=3)
+            plt.plot(data.time[section],Sin,'k')
+            plt.ylim(-210,210)
+            plt.title('R = ' + str(COR))
+        
+        
     
-    # check np.polyfit for linear regression
     
 
     #graph  
