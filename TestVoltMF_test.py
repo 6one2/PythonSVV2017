@@ -16,7 +16,7 @@ Fs=10000
 
 readfolder = '/Users/sebastienvillard/Documents/LawsonImaging/Expes/SVV/Test/CoilFieldVoltage/'
 datafile = ['MF020_High.lvm','MF060_High.lvm','MF020_Steps.lvm','MF060_Steps.lvm',]
-#datafile = ['MF020_Steps.lvm']
+datafile = ['MF020_Steps.lvm']
 Coef = np.zeros([len(datafile),2])
 
 for count, fname in enumerate(datafile):
@@ -61,7 +61,7 @@ for count, fname in enumerate(datafile):
             plt.figure()
             plt.plot(data.Current[section],data.MF[section],'.')
             plt.plot(data.Current[section],Y,'k',linewidth=1)
-            plt.title('Y = ' + str(P[0]) + 'X + ' + str(P[1]))
+            plt.title(fname + 'Y = ' + str(P[0]) + 'X + ' + str(P[1]))
         
         #find a coef for linear regression
         Coef[count,0] = np.mean(resP1[0:len(resP1)-1,0])
@@ -83,19 +83,3 @@ for count, fname in enumerate(datafile):
             plt.title('R = ' + str(COR))
         
         
-    
-    
-
-    #graph  
-    if False:
-#        plt.figure(0)
-#        plt.plot(data.time,data.MF)
-#        plt.plot(data.time,MFf,'k--',linewidth=1)
-        
-        
-    
-#old code
-if False:
-    #data = np.genfromtxt(readfolder+fname,delimiter='\t',skip_header=24)
-    data = pd.read_csv(readfolder+fname,skiprows=23,delimiter='\t')
-    data.columns = data.columns=(['time','MF','Current','V','Comment'])
