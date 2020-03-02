@@ -18,13 +18,16 @@ class Sub_SVV:
             return f'wrong number of output in data file'
         
         if cond[6]=='NA':
-            cond[6]=0
+            cond[6] = 0
         
+        if cond[5]=='SH':
+            cond[5] = 'CTRL'
+            
         res =  { 
             'id' : [self._id],
             'trial' : [cond[4]],
             'stim' : [cond[5]],
-            'freq' : [float(cond[6])],
+            'freq' : [int(cond[6])],
             'rep': [cond[1]],
             'Angle_init' : [float(ndata[0].split('=')[-1])],
             'SVV' : [float(ndata[1].split('=')[-1])],
